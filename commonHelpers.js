@@ -1,0 +1,12 @@
+import{S as d,i as u,a as p}from"./assets/vendor-6e18cf10.js";(function(){const e=document.createElement("link").relList;if(e&&e.supports&&e.supports("modulepreload"))return;for(const t of document.querySelectorAll('link[rel="modulepreload"]'))s(t);new MutationObserver(t=>{for(const n of t)if(n.type==="childList")for(const i of n.addedNodes)i.tagName==="LINK"&&i.rel==="modulepreload"&&s(i)}).observe(document,{childList:!0,subtree:!0});function r(t){const n={};return t.integrity&&(n.integrity=t.integrity),t.referrerpolicy&&(n.referrerPolicy=t.referrerpolicy),t.crossorigin==="use-credentials"?n.credentials="include":t.crossorigin==="anonymous"?n.credentials="omit":n.credentials="same-origin",n}function s(t){if(t.ep)return;t.ep=!0;const n=r(t);fetch(t.href,n)}})();const a=document.querySelector(".js-backdrop"),m={lines:8,length:33,width:4,radius:26,scale:.6,corners:.5,speed:1.6,rotate:0,animation:"spinner-line-fade-quick",direction:1,color:"#ffffff",fadeColor:"transparent",top:"49%",left:"50%",shadow:"0 0 1px transparent",zIndex:2e9,className:"spinner",position:"absolute"},f=new d(m),h=()=>{a.classList.remove("is-hidden"),f.spin(a)},c=()=>{a.classList.add("is-hidden"),f.stop()},l=document.querySelector(".img-container"),y="https://pixabay.com/api/",g="41741201-12a642cf53882fe64e8e82723",b=document.querySelector(".search-form"),L=o=>{const e=`${y}?key=${g}&q=${o}&image_type=photo&orientation=horizontal&safesearch=true`;return fetch(e).then(r=>{if(!r.ok)throw new Error(`Response is not success: ${r.status}`);return r.json()}).then(r=>(r.total===0&&u.info({position:"center",message:"Sorry, there are no images matching your search query. Please try again!"}),r))},w=o=>o.map(e=>`<div class="img-item">
+      <a href="${e.webformatURL}" class="lightbox-link">
+        <img src="${e.webformatURL}" alt="${e.tags}">
+      </a>
+      <div class="image-info">
+        <p>Likes: ${e.likes}</p>
+        <p>Views: ${e.views}</p>
+        <p>Comments: ${e.comments}</p>
+        <p>Downloads: ${e.downloads}</p>
+      </div>
+    </div>`).join(""),S=o=>{o.preventDefault(),h();const e=o.currentTarget.elements.query.value.trim();if(l.innerHTML="",e!=="")L(e).then(r=>{l.innerHTML=w(r.hits),new p(".lightbox-link").refresh()}).catch(r=>{console.error(r)}).finally(()=>{c()});else return c(),u.warning({position:"center",message:"Please enter a search query."})};b.addEventListener("submit",S);
+//# sourceMappingURL=commonHelpers.js.map
