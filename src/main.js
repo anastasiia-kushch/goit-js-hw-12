@@ -1,13 +1,42 @@
-import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css';
-import SimpleLightbox from "simplelightbox";
-import "simplelightbox/dist/simple-lightbox.min.css";
+import axios from 'axios';
+// import iziToast from 'izitoast';
+// import 'izitoast/dist/css/iziToast.min.css';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 import { spinnerPlay, spinnerStop } from './js/spinner';
 import { imgContainer, formEl } from './js/refs';
-import { getPhotos } from './js/getPhotos';
 import { createMarkUp } from './js/createMarkUp';
 
-const handleSubmit = event => {
+const BASE_URL = 'https://pixabay.com/api/';
+const API_KEY = '41741201-12a642cf53882fe64e8e82723';
+
+const searchImages = async query => {
+  try {
+    const response = await axios.get(BASE_URL, {
+      params: {
+        key: API_KEY,
+        q: query,
+        image_type: 'photo',
+        orientation: 'horizontal',
+        safesearch: true,
+      },
+    });
+
+    // if (response.data.total === 0) {
+    //   iziToast.info({
+    //     position: 'center',
+    //     message: 'Sorry, there are no images matching your search query. Please try again!',
+    //   });
+    // }
+
+    return response.data;
+  } catch (error) {
+    console.error('Error during image search:', error);
+    throw new Error('Failed to retrieve images');
+  }
+};
+
+const handleSubmit = async event => {
   event.preventDefault();
   spinnerPlay();
 
@@ -15,24 +44,26 @@ const handleSubmit = event => {
   imgContainer.innerHTML = '';
 
   if (searchQuery !== '') {
-    getPhotos(query, page)
-      .then(data => {
-        imgContainer.innerHTML = createMarkUp(data.hits);
-        const lightbox = new SimpleLightbox('.lightbox-link');
-        lightbox.refresh();
-      })
-      .catch(error => {
-        console.error(error);
-      })
-      .finally(() => {
-        spinnerStop();
-      })
+    try {
+      const data = await searchImages(searchQuery);
+      imgContainer.innerHTML = createMarkUp(data.hits);
+      const lightbox = new SimpleLightbox('.lightbox-link');
+      lightbox.refresh();
+    } catch (error) {
+      // iziToast.error({
+      //   position: 'center',
+      //   message: 'An error occurred while retrieving images. Please try again later.',
+      // });
+      console.error('Error during search:', error);
+    } finally {
+      spinnerStop();
+    }
   } else {
     spinnerStop();
-    return iziToast.warning({
-      position: 'center',
-      message: 'Please enter a search query.',
-    });
+    // iziToast.warning({
+    //   position: 'center',
+    //   message: 'Please enter a search query.',
+    // });
   }
 };
 
