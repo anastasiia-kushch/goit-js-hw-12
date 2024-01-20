@@ -1,14 +1,15 @@
 import axios from 'axios';
-// import iziToast from 'izitoast';
-// import 'izitoast/dist/css/iziToast.min.css';
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import { spinnerPlay, spinnerStop } from './js/spinner';
-import { imgContainer, formEl } from './js/refs';
+import { imgContainer, formEl, BASE_URL, API_KEY, loadMoreBtn } from './js/refs';
 import { createMarkUp } from './js/createMarkUp';
+import { hasMoreData } from './js/hasMoreData';
 
-const BASE_URL = 'https://pixabay.com/api/';
-const API_KEY = '41741201-12a642cf53882fe64e8e82723';
+// const BASE_URL = 'https://pixabay.com/api/';
+// const API_KEY = '41741201-12a642cf53882fe64e8e82723';
 
 const searchImages = async searchQuery => {
   try {
@@ -22,12 +23,12 @@ const searchImages = async searchQuery => {
       },
     });
 
-    // if (response.data.total === 0) {
-    //   iziToast.info({
-    //     position: 'center',
-    //     message: 'Sorry, there are no images matching your search query. Please try again!',
-    //   });
-    // }
+    if (response.data.total === 0) {
+      iziToast.info({
+        position: 'center',
+        message: 'Sorry, there are no images matching your search query. Please try again!',
+      });
+    }
 
     return response.data;
   } catch (error) {
@@ -50,21 +51,42 @@ const handleSubmit = async event => {
       const lightbox = new SimpleLightbox('.lightbox-link');
       lightbox.refresh();
     } catch (error) {
-      // iziToast.error({
-      //   position: 'center',
-      //   message: 'An error occurred while retrieving images. Please try again later.',
-      // });
+      iziToast.error({
+        position: 'center',
+        message: 'An error occurred while retrieving images. Please try again later.',
+      });
       console.error('Error during search:', error);
     } finally {
       spinnerStop();
     }
   } else {
     spinnerStop();
-    // iziToast.warning({
-    //   position: 'center',
-    //   message: 'Please enter a search query.',
-    // });
+    iziToast.warning({
+      position: 'center',
+      message: 'Please enter a search query.',
+    });
+  }
+};
+
+const handleMoreData = async () => {
+  page += 1;
+  spinnerPlay();
+
+  try {
+    const {
+      data: { results, totalHits },
+    } = await searchImages(query, page);
+
+    imgContainer.insertAdjacentHTML('beforeend', createMarkUp(results));
+    // onScroll();
+
+    hasMoreData(totalHits, page);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    spinnerStop();
   }
 };
 
 formEl.addEventListener('submit', handleSubmit);
+loadMoreBtn.addEventListener('click', handleMoreData);
