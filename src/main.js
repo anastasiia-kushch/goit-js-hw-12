@@ -4,7 +4,7 @@ import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 import { spinnerPlay, spinnerStop } from './js/spinner';
 import { imgContainer, formEl } from './js/refs';
-import { searchImages } from './js/searchImages';
+import { getPhotos } from './js/getPhotos';
 import { createMarkUp } from './js/createMarkUp';
 
 const handleSubmit = event => {
@@ -15,7 +15,7 @@ const handleSubmit = event => {
   imgContainer.innerHTML = '';
 
   if (searchQuery !== '') {
-    searchImages(searchQuery)
+    getPhotos(query, page)
       .then(data => {
         imgContainer.innerHTML = createMarkUp(data.hits);
         const lightbox = new SimpleLightbox('.lightbox-link');
