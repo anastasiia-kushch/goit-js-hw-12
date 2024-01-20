@@ -1,40 +1,18 @@
-import axios from 'axios';
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import { spinnerPlay, spinnerStop } from './js/spinner';
-import { imgContainer, formEl, BASE_URL, API_KEY, loadMoreBtn } from './js/refs';
+import { imgContainer, formEl, loadMoreBtn } from './js/refs';
+import { searchImages } from './js/searchImages';
 import { createMarkUp } from './js/createMarkUp';
 import { hasMoreData } from './js/hasMoreData';
 
-// const BASE_URL = 'https://pixabay.com/api/';
-// const API_KEY = '41741201-12a642cf53882fe64e8e82723';
+let currentPage = 1;
 
-const searchImages = async searchQuery => {
-  try {
-    const response = await axios.get(BASE_URL, {
-      params: {
-        key: API_KEY,
-        q: searchQuery,
-        image_type: 'photo',
-        orientation: 'horizontal',
-        safesearch: true,
-      },
-    });
-
-    if (response.data.total === 0) {
-      iziToast.info({
-        position: 'center',
-        message: 'Sorry, there are no images matching your search query. Please try again!',
-      });
-    }
-
-    return response.data;
-  } catch (error) {
-    console.error('Error during image search:', error);
-    throw new Error('Failed to retrieve images');
-  }
+const getCardHeight = () => {
+  const firstCard = document.querySelector('.img-container').firstElementChild;
+  return firstCard ? firstCard.getBoundingClientRect().height : 0;
 };
 
 const handleSubmit = async event => {
@@ -42,18 +20,25 @@ const handleSubmit = async event => {
   spinnerPlay();
 
   const searchQuery = event.currentTarget.elements.query.value.trim();
-  imgContainer.innerHTML = '';
+  const cardHeight = getCardHeight();
 
   if (searchQuery !== '') {
     try {
-      const data = await searchImages(searchQuery);
-      imgContainer.innerHTML = createMarkUp(data.hits);
+      const data = await searchImages(searchQuery, 1);
+      imgContainer.innerHTML += createMarkUp(data.hits);
       const lightbox = new SimpleLightbox('.lightbox-link');
       lightbox.refresh();
+      hasMoreData(data.totalHits, currentPage);
+
+      window.scrollBy({
+        top: cardHeight * 2,
+        behavior: 'smooth',
+      });
     } catch (error) {
       iziToast.error({
         position: 'center',
-        message: 'An error occurred while retrieving images. Please try again later.',
+        message:
+          'An error occurred while retrieving images. Please try again later.',
       });
       console.error('Error during search:', error);
     } finally {
@@ -69,20 +54,26 @@ const handleSubmit = async event => {
 };
 
 const handleMoreData = async () => {
-  page += 1;
   spinnerPlay();
 
   try {
-    const {
-      data: { results, totalHits },
-    } = await searchImages(query, page);
+    const searchQuery = formEl.elements.query.value.trim();
+    const { hits, totalHits } = await searchImages(
+      searchQuery,
+      currentPage + 1
+    );
 
-    imgContainer.insertAdjacentHTML('beforeend', createMarkUp(results));
-    // onScroll();
+    imgContainer.innerHTML += createMarkUp(hits);
+    hasMoreData(totalHits, currentPage + 1);
+    currentPage++;
 
-    hasMoreData(totalHits, page);
+    const cardHeight = getCardHeight();
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   } finally {
     spinnerStop();
   }
