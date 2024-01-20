@@ -10,12 +10,12 @@ import { createMarkUp } from './js/createMarkUp';
 const BASE_URL = 'https://pixabay.com/api/';
 const API_KEY = '41741201-12a642cf53882fe64e8e82723';
 
-const searchImages = async query => {
+const searchImages = async searchQuery => {
   try {
     const response = await axios.get(BASE_URL, {
       params: {
         key: API_KEY,
-        q: query,
+        q: searchQuery,
         image_type: 'photo',
         orientation: 'horizontal',
         safesearch: true,
