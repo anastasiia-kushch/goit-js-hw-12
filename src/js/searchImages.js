@@ -17,6 +17,7 @@ export const searchImages = async (q, page = 1, perPage = 40) => {
     });
 
     if (response.data.total === 0&& page === 1) {
+      imgContainer.innerHTML = '';
       iziToast.info({
         position: 'center',
         message:

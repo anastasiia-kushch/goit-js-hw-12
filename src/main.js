@@ -10,17 +10,11 @@ import { hasMoreData } from './js/hasMoreData';
 
 let currentPage = 1;
 
-const getCardHeight = () => {
-  const firstCard = document.querySelector('.img-container').firstElementChild;
-  return firstCard ? firstCard.getBoundingClientRect().height : 0;
-};
-
 const handleSubmit = async event => {
   event.preventDefault();
   spinnerPlay();
 
   const searchQuery = event.currentTarget.elements.query.value.trim();
-  const cardHeight = getCardHeight();
 
   if (searchQuery !== '') {
     try {
@@ -67,7 +61,8 @@ const handleMoreData = async () => {
     hasMoreData(totalHits, currentPage + 1);
     currentPage++;
 
-    const cardHeight = getCardHeight();
+    const cardHeight =
+      imgContainer.lastElementChild.getBoundingClientRect().height;
     window.scrollBy({
       top: cardHeight * 2,
       behavior: 'smooth',
