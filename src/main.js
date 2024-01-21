@@ -1,7 +1,6 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
+import { lightbox } from './js/refs';
 import { spinnerPlay, spinnerStop } from './js/spinner';
 import { imgContainer, formEl, loadMoreBtn } from './js/refs';
 import { searchImages } from './js/searchImages';
@@ -20,7 +19,7 @@ const handleSubmit = async event => {
     try {
       const data = await searchImages(searchQuery, 1);
       imgContainer.insertAdjacentHTML('beforeend', createMarkUp(data.hits));
-      const lightbox = new SimpleLightbox('.lightbox-link');
+
       lightbox.refresh();
       hasMoreData(data.totalHits, currentPage);
     } catch (error) {
