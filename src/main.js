@@ -19,15 +19,10 @@ const handleSubmit = async event => {
   if (searchQuery !== '') {
     try {
       const data = await searchImages(searchQuery, 1);
-      imgContainer.innerHTML += createMarkUp(data.hits);
+      imgContainer.insertAdjacentHTML('beforeend', createMarkUp(data.hits));
       const lightbox = new SimpleLightbox('.lightbox-link');
       lightbox.refresh();
       hasMoreData(data.totalHits, currentPage);
-
-      window.scrollBy({
-        top: cardHeight * 2,
-        behavior: 'smooth',
-      });
     } catch (error) {
       iziToast.error({
         position: 'center',
@@ -57,14 +52,15 @@ const handleMoreData = async () => {
       currentPage + 1
     );
 
-    imgContainer.innerHTML += createMarkUp(hits);
+    imgContainer.insertAdjacentHTML('beforeend', createMarkUp(hits));
     hasMoreData(totalHits, currentPage + 1);
     currentPage++;
 
     const cardHeight =
       imgContainer.lastElementChild.getBoundingClientRect().height;
+      console.log(cardHeight);
     window.scrollBy({
-      top: cardHeight * 2,
+      top: cardHeight * 5,
       behavior: 'smooth',
     });
   } catch (error) {
