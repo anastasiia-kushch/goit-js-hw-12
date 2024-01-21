@@ -1,5 +1,4 @@
 import { BASE_URL, API_KEY } from './refs';
-import iziToast from 'izitoast';
 import axios from 'axios';
 
 export const searchImages = async (q, page = 1, perPage = 40) => {
@@ -12,18 +11,9 @@ export const searchImages = async (q, page = 1, perPage = 40) => {
         orientation: 'horizontal',
         safesearch: true,
         page,
-        perPage
+        per_page: perPage
       },
     });
-
-    if (response.data.total === 0&& page === 1) {
-      imgContainer.innerHTML = '';
-      iziToast.info({
-        position: 'center',
-        message:
-          'Sorry, there are no images matching your search query. Please try again!',
-      });
-    }
 
     return response.data;
   } catch (error) {
